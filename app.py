@@ -7,7 +7,7 @@ app = FastAPI()
 # Load model ONCE at startup
 llm = Llama(
     model_path="models/qwen2.5-0.5b-instruct.gguf",
-    n_ctx=512,
+    n_ctx=1024,
     n_threads=2,
     # verbose=False
 )
@@ -22,10 +22,14 @@ class GenerateRequest(BaseModel):
     hobby: str
     lang: str
 
+@app.get("/")
+def health():
+    return {"status": "ok"}
+
 @app.post("/generate")
 def generate(req: GenerateRequest):
     prompt = f"""
-You are writing a birthday card message.
+Write a birthday card message.
 
 Write the ACTUAL birthday message text.
 Do NOT explain anything.
