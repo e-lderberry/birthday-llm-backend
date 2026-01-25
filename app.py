@@ -9,7 +9,7 @@ llm = Llama(
     model_path="models/qwen2.5-0.5b-instruct.gguf",
     n_ctx=1024,
     n_threads=4,
-    verbose=False
+    # verbose=False
 )
 
 class GenerateRequest(BaseModel):
@@ -22,20 +22,23 @@ class GenerateRequest(BaseModel):
 @app.post("/generate")
 def generate(req: GenerateRequest):
     prompt = f"""
-You are a funny birthday card generator.
+You are writing a birthday card message.
+
+Write the ACTUAL birthday message text.
+Do NOT explain anything.
+Do NOT write rules or lists.
+Do NOT evaluate anything.
 
 Language: {req.lang}
-Name: {req.name}
-Age: {req.age}
-Adjective: {req.adjective}
-Hobby: {req.hobby}
 
-Rules:
-- Write ONE short funny birthday message
-- 1–2 sentences
-- Friendly and playful
-- No explanations
-- No hashtags
+Details to include naturally:
+- Name: {req.name}
+- Age: {req.age}
+- Adjective: {req.adjective}
+- Hobby: {req.hobby}
+
+Write ONE short funny birthday message (1–2 sentences).
+Output ONLY the message text.
 """
 
     output = llm(
@@ -43,7 +46,7 @@ Rules:
         max_tokens=80,
         temperature=0.9,
         top_p=0.95,
-        stop=["\n\n"]
+        stop=["\n", "-"]
     )
 
     text = output["choices"][0]["text"].strip()
